@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-28T05:32:58.864848+00:00",
+  "title": "Mercury prototype design",
+  "extensions": {
+    "shadows": [],
+    "motion": [
+      {
+        "name": "status-spin",
+        "value": "1s linear infinite",
+        "purpose": "Loading state; disabled by prefers-reduced-motion"
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "mobile",
+        "value": "640px"
+      },
+      {
+        "name": "tablet",
+        "value": "1000px"
+      },
+      {
+        "name": "wide",
+        "value": "1600px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "description": "Extracted prototype component",
+      "html": "<button class=\"ds-primary-button\">检测全部站点</button>",
+      "css": ".ds-primary-button{ display: flex; align-items: center; justify-content: center; gap: 10px; border: 0; border-radius: 10px; background: var(--primary); color: #fff; font-weight: 600; padding: 0 25px; min-height: 54px; white-space: nowrap; transition: background .18s; }\n.ds-primary-button:hover:not(:disabled){ background: #183caa; }\n.ds-primary-button{ min-height: 46px; font-size: 14px; }\n.ds-primary-button:focus-visible{outline:3px solid #2453dd;outline-offset:4px}"
+    },
+    {
+      "name": "Open Button",
+      "kind": "button",
+      "description": "Extracted prototype component",
+      "html": "<button class=\"ds-open-button\">打开网站</button>",
+      "css": ".ds-open-button{ display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 7px; min-height: 41px; font-size: 14px; font-weight: 550; }\n.ds-open-button{ background: #eef2ff; color: #244bbe; }\n.ds-open-button:hover{ background: #dee7ff; }\n.ds-open-button:focus-visible{outline:3px solid #2453dd;outline-offset:4px}"
+    },
+    {
+      "name": "Check Button",
+      "kind": "button",
+      "description": "Extracted prototype component",
+      "html": "<button class=\"ds-check-button\">检测</button>",
+      "css": ".ds-check-button{ display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 7px; min-height: 41px; font-size: 14px; font-weight: 550; }\n.ds-check-button{ color: #4c5a73; background: #fff; border: 1px solid #dbe1eb; }\n.ds-check-button:hover:not(:disabled){ background: #f5f7fb; border-color: #a8b8df; }\n.ds-check-button:focus-visible{outline:3px solid #2453dd;outline-offset:4px}"
+    },
+    {
+      "name": "Search",
+      "kind": "input",
+      "description": "Extracted prototype component",
+      "html": "<div class=\"ds-search-wrap\">搜索站点名称或网址</div>",
+      "css": ".ds-search-wrap{ border: 1px solid #cbd4e4; border-radius: 10px; display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; background: #fff; padding: 0 18px; color: var(--muted-foreground); height: 54px; }\n.ds-search-wrap:focus-within{ border-color: var(--primary); outline: 2px solid #2453dd20; }\n.ds-search-wrap input{ border: none; background: transparent; outline: 0; width: 100%; min-width: 0; color: var(--foreground); }\n.ds-search-wrap input::placeholder{ color: #65728a; }\n.ds-search-wrap button{ display: grid; place-items: center; background: transparent; border: 0; width: 32px; height: 36px; }\n.ds-search-wrap{ flex-basis: auto; height: 50px; flex-shrink: 0; }\n.ds-search-wrap:focus-visible{outline:3px solid #2453dd;outline-offset:4px}"
+    },
+    {
+      "name": "Category",
+      "kind": "nav",
+      "description": "Extracted prototype component",
+      "html": "<button class=\"ds-category-tab\">动画资源</button>",
+      "css": ".ds-category-tab{ padding: 10px 14px; min-height: 42px; font-size: 14px; font-weight: 550; color: #58647a; border: 0; border-radius: 8px; gap: 8px; }\n.ds-category-tab[data-state=\"active\"]{ color: #244bbe; background: #e6edff; box-shadow: none; }\n.ds-category-tab:hover{ background: #eaf0ff; }\n.ds-category-tab{ padding: 10px 9px; gap: 5px; font-size: 13px; }\n.ds-category-tab:focus-visible{outline:3px solid #2453dd;outline-offset:4px}"
+    },
+    {
+      "name": "Site Card",
+      "kind": "card",
+      "description": "Extracted prototype component",
+      "html": "<article class=\"ds-site-card\">MINI4K 迷客电影</article>",
+      "css": ".ds-site-card{ background: #fff; border: 1px solid #dde3ed; border-radius: 14px; padding: 23px; transition: border-color .2s; min-width: 0; }\n.ds-site-card:hover{ border-color: #a8b8df; }\n.ds-site-card.is-checking{ border-color: #2453dd; }\n.ds-site-card{ padding: 21px; }\n.ds-site-card{ padding: 22px; }\n.ds-site-card:focus-visible{outline:3px solid #2453dd;outline-offset:4px}"
+    }
+  ],
+  "narrative": {
+    "overview": "Temporary code-led prototype requested by the user. Basic aesthetics support rapid navigation and factual status interpretation.",
+    "keyCharacteristics": [
+      "Clear site identity",
+      "Visible direct navigation",
+      "Evidence-limited status wording"
+    ],
+    "rules": [],
+    "dos": [
+      "Pair status colors with explicit text."
+    ],
+    "donts": [
+      "Do not equate HTTP success with downloadable resources."
+    ]
+  }
+}

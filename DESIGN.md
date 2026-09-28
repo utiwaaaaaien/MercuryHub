@@ -1,13 +1,76 @@
-# Prototype design contract
+---
+name: Mercury 影视资源导航原型
+description: 影视资源站点导航与服务器连接检测
+colors:
+  primary: "#2453dd"
+  surface: "#f5f7fb"
+  paper: "#ffffff"
+  ink: "#1a253b"
+  secondary-text: "#5f6b80"
+  rule: "#dde3ed"
+  success: "#136d4c"
+  caution: "#895411"
+  error: "#af3038"
+typography:
+  title:
+    fontSize: "clamp(26px, 2.6vw, 36px)"
+    fontWeight: 700
+    lineHeight: 1.4
+    letterSpacing: "-0.035em"
+  body:
+    fontFamily: '"PingFang SC", "Microsoft YaHei", -apple-system, BlinkMacSystemFont, sans-serif'
+    fontSize: "16px"
+    lineHeight: 1.6
+  label:
+    fontSize: "14px"
+rounded:
+  card: "14px"
+  control: "10px"
+  action: "7px"
+spacing:
+  card-inset: "23px"
+  grid-gap: "18px"
+components:
+  primary-button:
+    backgroundColor: "{colors.primary}"
+    textColor: "{colors.paper}"
+    rounded: "{rounded.control}"
+    height: "54px"
+---
 
-User scope: working public prototype with basic aesthetics; later visual refinement is explicitly deferred. This is a temporary code-led implementation, not an approved permanent brand.
+# Mercury Prototype Design
 
-Mode: Operate. Compact reference-library navigation. Visitors find a named site, open its exact URL, and optionally check the entry from the server network.
+## Overview
 
-First viewport: white header, short title, search plus a blue batch-check action, category filters, status summary, and real resource entries. No decorative imagery. Cards are appropriate to the explicitly discussed site directory.
+Temporary code-led prototype requested by the user. Basic aesthetics support rapid navigation and factual status interpretation. Final brand, custom typography and decorative identity remain deferred.
 
-Tokens: surface #f5f7fb, paper #ffffff, ink #1a253b, secondary #5f6b80, accent #2453dd, rule #dde3ed; success #136d4c, caution #895411, error #af3038. Font: platform Chinese sans. Body 16px, labels 14px, secondary metadata 12–13px. Cards radius 14px, controls 7–10px; 18px grid gap, 23px card inset. Desktop 3 columns, wide desktop 4, tablet 2, phone 1.
+## Colors
 
-Interaction: loading changes the existing status row and card outline; results update in place without reordering. New-tab navigation always remains available. Respect reduced motion. Errors in the check service preserve prior results and do not label the target unavailable.
+Primary blue identifies actions. Success, caution and error colors always accompany text labels. Cool surfaces distinguish page, cards and controls.
 
-Deferred: final name/logo, brand typography, custom domain, shared durable check history and broader anti-abuse infrastructure.
+## Typography
+
+Current prototype uses the platform Chinese sans stack. Body text is 16px, labels 14px and supporting metadata 12–13px. The platform display face is provisional, not a final brand commitment.
+
+## Layout
+
+A compact header precedes search, category filters, detection summary and directory cards. Grid: three columns by default, four from 1600px, two up to 1000px, one up to 640px. Main container max-width 1304px (1544px wide desktop), 32px horizontal inset, 20px mobile.
+
+## Elevation & Depth
+
+Cards use one-pixel borders without shadows. Focus outlines remain visible. Changes in border and background communicate interaction.
+
+## Shapes
+
+Soft rectangular cards and controls; functional symbols from Lucide, text marks for individual sites. No decorative image assets.
+
+## Components
+
+Primary action checks all 18 sites. Search and category filters update results in place. Each card preserves its external opening action through loading and errors. Progress updates in place; reduced-motion preferences disable the loading spin.
+
+## Do's and Don'ts
+
+- Do pair status colors with explicit text and preserve original detection time.
+- Do keep direct navigation available after detection failure.
+- Don't present original spreadsheet capacity as live statistics.
+- Don't equate HTTP success with usable downloadable resources.
