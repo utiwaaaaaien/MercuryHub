@@ -3,6 +3,8 @@ name: Publish MercuryHub
 on:
   push:
     branches: [main]
+  schedule:
+    - cron: '17 3 * * *'
   workflow_dispatch:
 
 permissions:
@@ -32,6 +34,7 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm build:pages
+      - run: node --experimental-strip-types scripts/generate-checks.mjs pages-dist/checks.json
       - uses: actions/upload-pages-artifact@v4
         with:
           path: pages-dist
