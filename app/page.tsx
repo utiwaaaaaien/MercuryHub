@@ -110,7 +110,7 @@ export default function Home() {
   return <div className="app-shell">
     <header className="topbar"><a href="/" className="brand" aria-label="MercuryHub 首页"><span className="brand-icon"><Clapperboard size={20} /></span><span>MercuryHub</span></a><span className="brand-subtitle">影视资源导航</span><button className={`help-toggle ${showHelp ? "selected" : ""}`} onClick={() => setShowHelp(v => !v)} aria-expanded={showHelp} aria-controls="check-help"><CircleHelp size={17} /><span>检测说明</span></button></header>
     <main className="main-wrap">
-      <section className="intro"><h1>好资源，直接抵达。</h1><p>按原表推荐星级浏览 {sites.length} 个影视资源站点，选择入口即可打开。</p></section>
+      <section className="intro"><h1>好资源，直接抵达。</h1><p>按星级浏览 {sites.length} 个影视资源站点，选择入口即可打开。</p></section>
       {showHelp && <section id="check-help" className="help-panel"><h2>检测结果应该怎么看？</h2><p>为减少代理和托管服务的请求量，已关闭批量检测。每次只检测一个站点，两次新请求至少间隔 30 秒；同一入口在 15 分钟内复用上次结果，不会重新访问目标站点。</p><p>检测从服务器发出，与您当前的网络、代理和登录状态可能不同。“请求成功”只表示入口返回成功响应，不保证资源可下载。受限、超时和跨域跳转请手动打开确认。历史结果保存在当前浏览器，并保留原检测时间。</p></section>}
       <section className="workspace" aria-label="站点导航与检测">
         <div className="action-row"><div className="search-wrap"><Search size={20} /><input aria-label="搜索站点名称或网址" placeholder="搜索站点名称或网址…" value={query} onChange={event => setQuery(event.target.value)} />{query && <button onClick={() => setQuery("")} aria-label="清空搜索"><X size={17} /></button>}</div><p className={`check-policy ${cooldownSeconds > 0 ? "is-cooling" : ""}`}>逐站检测 · {cooldownSeconds > 0 ? `${cooldownSeconds} 秒后可检测下一个` : "每次新请求间隔 30 秒"}</p></div>
@@ -124,10 +124,10 @@ export default function Home() {
           const state = result?.state ?? "unchecked";
           const recent = !!result && Date.now() - Date.parse(result.checkedAt) < RESULT_CACHE_MS;
           return <article key={site.id} className={`site-card ${loading ? "is-checking" : ""}`} data-site-id={site.id}>
-            <div className="card-head"><div className={`site-mark tone-${site.categories.length === 2 ? "blue" : site.categories[0] === "动画" ? "violet" : "slate"}`} aria-hidden="true">{site.mark}</div><div className="site-title"><h3><a href={site.url} target="_blank" rel="noopener noreferrer">{site.name}</a></h3><span>{new URL(site.url).hostname.replace(/^www\./, "")}</span></div></div>
-            <div className="rating" title="推荐星级来自原表" aria-label={`原表推荐 ${site.rating} 星，满分 5 星`}>{Array.from({ length: 5 }, (_, index) => <Star key={index} size={15} strokeWidth={1.8} fill={index < site.rating ? "currentColor" : "none"} className={index < site.rating ? "star-filled" : "star-empty"} />)}<span>{site.rating} 星</span></div>
+            <div className="card-head"><div className="site-title"><h3><a href={site.url} target="_blank" rel="noopener noreferrer">{site.name}</a></h3><span>{new URL(site.url).hostname.replace(/^www\./, "")}</span></div></div>
+            <div className="rating" aria-label={`站点星级 ${site.rating} 星，满分 5 星`}>{Array.from({ length: 5 }, (_, index) => <Star key={index} size={15} strokeWidth={1.8} fill={index < site.rating ? "currentColor" : "none"} className={index < site.rating ? "star-filled" : "star-empty"} />)}<span>{site.rating} 星</span></div>
             <div className="site-tags">{site.categories.map(tag => <span key={tag}>{tag}</span>)}</div>
-            <div className="site-capacity">原表片库记录 <strong>{site.capacity.toLocaleString("zh-CN")} 部</strong></div>
+            <div className="site-capacity">片库容量 <strong>{site.capacity.toLocaleString("zh-CN")} 部</strong></div>
             <div className="card-actions"><a className="open-button" href={site.url} target="_blank" rel="noopener noreferrer">打开网站<ArrowUpRight size={18} /></a><button className="check-button" onClick={() => checkOne(site.id)} disabled={loading || (cooldownSeconds > 0 && !recent) || (checking.size > 0 && !recent)} aria-label={`${recent ? "查看最近结果" : "检测"} ${site.name}`}><Radio size={16} />{recent ? "最近结果" : "检测"}</button></div>
             <div className="check-area" aria-live="polite"><div className={`check-state ${loading ? "loading" : state}`}>{loading ? <LoaderCircle className="spin" size={15} /> : state === "reachable" ? <Check size={15} /> : ["restricted", "review", "error", "failed"].includes(state) ? <ShieldAlert size={15} /> : <Clock3 size={15} />}<span>{loading ? "正在检测…" : labels[state]}</span>{result && !loading && <span className="response-code">{result.statusCode ? `HTTP ${result.statusCode}` : ""}</span>}</div><p className="check-time">{result ? `${stale ? "历史 · " : ""}${timeLabel(result.checkedAt)}${result.cached ? " · 缓存" : ""}` : "点击检测，查看当前连接情况"}</p>{errors[site.id] && <p className="check-service-error">{errors[site.id]}{result ? "（上次结果保留）" : ""}</p>}</div>
             {result && <details className="result-details"><summary>检测详情</summary><p>{result.reason}</p><dl><div><dt>检测网络</dt><dd>{result.location}</dd></div><div><dt>请求耗时</dt><dd>{(result.durationMs / 1000).toFixed(2)} 秒</dd></div><div><dt>检查地址</dt><dd>{result.finalUrl}</dd></div></dl></details>}
@@ -135,7 +135,7 @@ export default function Home() {
         })}</div>
         {visible.length === 0 && <div className="empty-state"><Search size={28} /><h3>没有找到匹配的站点</h3><p>换个名称，或清除筛选再试。</p><button onClick={() => { setQuery(""); setCategory("all"); setStatus("all"); }}>清除全部筛选</button></div>}
       </section>
-      <footer><span>MercuryHub</span><p>站点、容量与推荐星级来自原表。连接检测不代表资源可下载。</p></footer>
+      <footer><span>MercuryHub</span><p>星级与容量为收录时记录。连接检测不代表资源可下载。</p></footer>
     </main>
   </div>;
 }

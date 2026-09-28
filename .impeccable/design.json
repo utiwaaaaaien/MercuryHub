@@ -69,7 +69,8 @@
       "Keep external links available after check errors."
     ],
     "dos": [
-      "Label ratings and capacity as source records."
+      "Use target-page names in directory cards.",
+      "Keep recorded stars and capacity distinct from live data."
     ],
     "donts": [
       "Do not present server checks as download verification."

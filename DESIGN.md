@@ -64,7 +64,7 @@ The directory takes its visual reference from the [Apple Developer homepage](htt
 
 ## Colors
 
-A white navigation bar and white site cards sit on a pale gray page. Near-black text establishes hierarchy. Blue identifies the direct link and focus state. Gold is reserved for the source's recommendation stars. Green, amber, and red retain their meanings for server check results and always accompany text labels.
+A white navigation bar and white site cards sit on a pale gray page. Near-black text establishes hierarchy. Blue identifies the direct link and focus state. Gold is reserved for the site stars. Green, amber, and red retain their meanings for server check results and always accompany text labels.
 
 ## Typography
 
@@ -84,10 +84,10 @@ Cards use a 16 pixel radius, search uses 12 pixels, and action controls use 9 pi
 
 ## Components
 
-Each card presents the site name and domain, the source's five point star scale, resource categories, and the source's capacity value before actions. The blue “打开网站” link is the primary action. The outlined “检测” button and result details remain secondary. Server check failures never disable the external link.
+Each card presents the target site's visible name and domain, its five point star scale, resource categories, and recorded capacity before actions. Cards have no thumbnail or monogram. The blue “打开网站” link is the primary action. The outlined “检测” button and result details remain secondary. Server check failures never disable the external link.
 
 ## Do's and Don'ts
 
-- Keep source ratings and capacity labeled as source records.
+- Describe ratings and capacity as recorded values when context is needed.
 - Preserve an immediate path to every external website.
 - Show server check times and status wording without implying local browser access or download availability.

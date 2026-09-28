@@ -1,15 +1,14 @@
 [
   {
     "id": "mini4k",
-    "name": "MINI4K 迷客电影",
+    "name": "Mini4k",
     "capacity": 77638,
     "categories": [
       "真人",
       "动画"
     ],
     "rating": 5,
-    "url": "https://mini4k.io/movies",
-    "mark": "M4"
+    "url": "https://mini4k.io/movies"
   },
   {
     "id": "rb4k",
@@ -20,8 +19,7 @@
       "动画"
     ],
     "rating": 5,
-    "url": "https://rb4k.cn/",
-    "mark": "RB"
+    "url": "https://rb4k.cn/"
   },
   {
     "id": "seedhub",
@@ -32,8 +30,7 @@
       "动画"
     ],
     "rating": 5,
-    "url": "https://sidhub.cc/",
-    "mark": "SH"
+    "url": "https://sidhub.cc/"
   },
   {
     "id": "bitba",
@@ -44,31 +41,28 @@
       "动画"
     ],
     "rating": 5,
-    "url": "https://www.bitba.net/",
-    "mark": "BT"
+    "url": "https://www.bitba.net/"
   },
   {
     "id": "pomo",
-    "name": "POMO",
+    "name": "Pomo",
     "capacity": 3600,
     "categories": [
       "真人",
       "动画"
     ],
     "rating": 4,
-    "url": "https://pomo.mom/",
-    "mark": "PO"
+    "url": "https://pomo.mom/"
   },
   {
     "id": "hdduck",
-    "name": "高清鸭 HDDUCK",
+    "name": "高清鸭-HDDUCK",
     "capacity": 20000,
     "categories": [
       "真人"
     ],
     "rating": 3,
-    "url": "https://hdduck.com/",
-    "mark": "HD"
+    "url": "https://hdduck.com/"
   },
   {
     "id": "butailing",
@@ -78,19 +72,17 @@
       "真人"
     ],
     "rating": 4,
-    "url": "http://www.butailing.com/",
-    "mark": "灵"
+    "url": "http://www.butailing.com/"
   },
   {
     "id": "easyoo",
-    "name": "4K电影资源站",
+    "name": "4K影视小站",
     "capacity": 72250,
     "categories": [
       "真人"
     ],
     "rating": 4,
-    "url": "https://www.easyoo.cn/",
-    "mark": "4K"
+    "url": "https://www.easyoo.cn/"
   },
   {
     "id": "trex",
@@ -101,30 +93,27 @@
       "动画"
     ],
     "rating": 4,
-    "url": "https://t-rex.tzfile.com/",
-    "mark": "团"
+    "url": "https://t-rex.tzfile.com/"
   },
   {
     "id": "animes",
-    "name": "动漫花园镜像站",
+    "name": "Anime Garden",
     "capacity": 10000,
     "categories": [
       "动画"
     ],
     "rating": 5,
-    "url": "https://animes.garden/",
-    "mark": "花"
+    "url": "https://animes.garden/"
   },
   {
     "id": "dtsma",
-    "name": "蓝光电影网 DTSMA",
+    "name": "蓝光电影网",
     "capacity": 2908,
     "categories": [
       "真人"
     ],
     "rating": 3,
-    "url": "https://www.dtsma.com/",
-    "mark": "DT"
+    "url": "https://www.dtsma.com/"
   },
   {
     "id": "4kbt",
@@ -134,19 +123,17 @@
       "真人"
     ],
     "rating": 3,
-    "url": "https://4kbt.org/",
-    "mark": "4K"
+    "url": "https://4kbt.org/"
   },
   {
     "id": "4k007",
-    "name": "蓝光高清网",
+    "name": "蓝光高清电影网",
     "capacity": 1000,
     "categories": [
       "真人"
     ],
     "rating": 3,
-    "url": "https://www.4k007.com/",
-    "mark": "蓝"
+    "url": "https://www.4k007.com/"
   },
   {
     "id": "vcb",
@@ -156,30 +143,27 @@
       "动画"
     ],
     "rating": 3,
-    "url": "https://vcb-s.com/archives/138",
-    "mark": "VC"
+    "url": "https://vcb-s.com/archives/138"
   },
   {
     "id": "acgrip",
-    "name": "ACG-RIP",
+    "name": "ACG.RIP",
     "capacity": 1000,
     "categories": [
       "动画"
     ],
     "rating": 3,
-    "url": "https://acg.rip/",
-    "mark": "AC"
+    "url": "https://acg.rip/"
   },
   {
     "id": "bilibili",
-    "name": "bilibili",
+    "name": "哔哩哔哩",
     "capacity": 3000,
     "categories": [
       "动画"
     ],
     "rating": 4,
-    "url": "https://www.bilibili.com/anime/",
-    "mark": "哔"
+    "url": "https://www.bilibili.com/anime/"
   },
   {
     "id": "suenen",
@@ -190,8 +174,7 @@
       "动画"
     ],
     "rating": 3,
-    "url": "https://suenen.com/forum-7.htm",
-    "mark": "盘"
+    "url": "https://suenen.com/forum-7.htm"
   },
   {
     "id": "fx57",
@@ -202,7 +185,6 @@
       "动画"
     ],
     "rating": 3,
-    "url": "http://www.fx57.cn/",
-    "mark": "枫"
+    "url": "http://www.fx57.cn/"
   }
 ]
