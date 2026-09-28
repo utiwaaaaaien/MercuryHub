@@ -62,7 +62,9 @@ export default function Home() {
     const timer = setTimeout(() => controller.abort("timeout"), 18000);
     try {
       const response = await fetch("/api/check", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }), signal: controller.signal });
-      const payload = await response.json() as CheckResult & { error?: string };
+      let payload: CheckResult & { error?: string };
+      try { payload = await response.json() as CheckResult & { error?: string }; }
+      catch { throw new Error("检测服务暂时未返回结果，请稍后重试；这不代表目标网站失效"); }
       if (!response.ok) throw new Error(payload.error || "检测服务暂不可用，请稍后重试");
       if (payload.id !== id || !labels[payload.state] || !payload.checkedAt) throw new Error("检测服务返回异常，请重试");
       setResults(prev => ({ ...prev, [id]: payload }));
