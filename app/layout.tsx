@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Mercury 影视资源导航",
-  description: "集中浏览影视资源站点，一键跳转与服务器链接检测。",
+  title: "MercuryHub · 影视资源导航",
+  description: "按推荐星级浏览影视资源站点，快速打开资源网站并查看服务器连接检测结果。",
   other: {
     "codex-preview": "development",
   },

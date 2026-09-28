@@ -1,76 +1,93 @@
 ---
-name: Mercury 影视资源导航原型
-description: 影视资源站点导航与服务器连接检测
+name: MercuryHub
+description: 按推荐星级快速进入影视资源网站
 colors:
-  primary: "#2453dd"
-  surface: "#f5f7fb"
+  primary: "#0066cc"
+  primary-deep: "#0055ad"
+  primary-text: "#0058b2"
+  primary-soft: "#e8f2ff"
+  surface: "#f5f5f7"
   paper: "#ffffff"
-  ink: "#1a253b"
-  secondary-text: "#5f6b80"
-  rule: "#dde3ed"
+  ink: "#1d1d1f"
+  ink-secondary: "#414146"
+  text-muted: "#55555a"
+  text-quiet: "#66666b"
+  rule: "#dddddf"
+  rule-soft: "#ededf0"
+  input-rule: "#d4d4da"
+  star: "#9b6300"
+  star-empty: "#aaaab1"
   success: "#136d4c"
   caution: "#895411"
-  error: "#af3038"
+  error: "#b42332"
 typography:
-  title:
-    fontSize: "clamp(26px, 2.6vw, 36px)"
-    fontWeight: 700
-    lineHeight: 1.4
+  display:
+    fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC", "Microsoft YaHei", sans-serif'
+    fontSize: "clamp(32px, 3.7vw, 48px)"
+    fontWeight: 720
+    lineHeight: 1.15
     letterSpacing: "-0.035em"
   body:
-    fontFamily: '"PingFang SC", "Microsoft YaHei", -apple-system, BlinkMacSystemFont, sans-serif'
     fontSize: "16px"
-    lineHeight: 1.6
+    lineHeight: 1.5
+  title:
+    fontSize: "23px"
+    fontWeight: 700
   label:
-    fontSize: "14px"
+    fontSize: "13px"
 rounded:
-  card: "14px"
-  control: "10px"
-  action: "7px"
+  tag: "5px"
+  small: "9px"
+  control: "12px"
+  card: "16px"
 spacing:
-  card-inset: "23px"
-  grid-gap: "18px"
+  grid-gap: "16px"
+  card-inset: "22px"
 components:
-  primary-button:
+  open-button:
     backgroundColor: "{colors.primary}"
     textColor: "{colors.paper}"
-    rounded: "{rounded.control}"
-    height: "54px"
+    rounded: "{rounded.small}"
+    height: "44px"
+  site-card:
+    backgroundColor: "{colors.paper}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.card}"
+    padding: "{spacing.card-inset}"
 ---
 
-# Mercury Prototype Design
+# MercuryHub Design System
 
 ## Overview
 
-Temporary code-led prototype requested by the user. Basic aesthetics support rapid navigation and factual status interpretation. Final brand, custom typography and decorative identity remain deferred.
+The directory takes its visual reference from the [Apple Developer homepage](https://developer.apple.com/cn/): restrained navigation, generous space, dark type, pale neutral surfaces, and a single blue action color. The page is a working directory, so search, star ranking, and direct links take priority over promotional imagery.
 
 ## Colors
 
-Primary blue identifies actions. Success, caution and error colors always accompany text labels. Cool surfaces distinguish page, cards and controls.
+A white navigation bar and white site cards sit on a pale gray page. Near-black text establishes hierarchy. Blue identifies the direct link and focus state. Gold is reserved for the source's recommendation stars. Green, amber, and red retain their meanings for server check results and always accompany text labels.
 
 ## Typography
 
-Current prototype uses the platform Chinese sans stack. Body text is 16px, labels 14px and supporting metadata 12–13px. The platform display face is provisional, not a final brand commitment.
+Use the system font stack so Chinese and Latin names render naturally across devices. The page title ranges from 32 to 48 pixels. Site names, domains, star labels, and supporting metadata step down clearly. Numeric capacity and status counts use tabular numerals.
 
 ## Layout
 
-A compact header precedes search, category filters, detection summary and directory cards. Grid: three columns by default, four from 1600px, two up to 1000px, one up to 640px. Main container max-width 1304px (1544px wide desktop), 32px horizontal inset, 20px mobile.
+The content width is 1180 pixels inside a 1236 pixel container. Site cards use three columns on desktop, two below 1000 pixels, and one below 680 pixels. Search sits above category and status filters. All filtered results retain descending star order. On a phone, the direct link for the first card stays visible in the initial viewport.
 
 ## Elevation & Depth
 
-Cards use one-pixel borders without shadows. Focus outlines remain visible. Changes in border and background communicate interaction.
+Surfaces are flat at rest. A site card lifts slightly with a soft shadow on hover. Search uses a blue focus ring. Borders separate the compact monitoring row and secondary controls.
 
 ## Shapes
 
-Soft rectangular cards and controls; functional symbols from Lucide, text marks for individual sites. No decorative image assets.
+Cards use a 16 pixel radius, search uses 12 pixels, and action controls use 9 pixels. Small tags use 5 pixels. The black brand mark is a compact rounded square.
 
 ## Components
 
-Each card supports a single on-demand check, with a visible cooldown between new requests. Search and category filters update results in place. Each card preserves its external opening action through loading and errors; reduced-motion preferences disable the loading spin.
+Each card presents the site name and domain, the source's five point star scale, resource categories, and the source's capacity value before actions. The blue “打开网站” link is the primary action. The outlined “检测” button and result details remain secondary. Server check failures never disable the external link.
 
 ## Do's and Don'ts
 
-- Do pair status colors with explicit text and preserve original detection time.
-- Do keep direct navigation available after detection failure.
-- Don't present original spreadsheet capacity as live statistics.
-- Don't equate HTTP success with usable downloadable resources.
+- Keep source ratings and capacity labeled as source records.
+- Preserve an immediate path to every external website.
+- Show server check times and status wording without implying local browser access or download availability.
