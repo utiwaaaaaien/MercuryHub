@@ -5,13 +5,32 @@ const catalog = new Map(sites.map(site => [site.id, site]));
 const cache = new Map<string, { at: number; result: CheckResult }>();
 const pending = new Map<string, Promise<CheckResult>>();
 const limits = new Map<string, { at: number; count: number }>();
-const headers = { "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" };
+const GITHUB_PAGES_ORIGIN = "https://utiwaaaaaien.github.io";
+const baseHeaders = { "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff", Vary: "Origin" };
 const RESULT_CACHE_MS = 15 * 60_000;
 const REQUEST_INTERVAL_MS = 30_000;
 
+function responseHeaders(origin: string | null) {
+  return origin === GITHUB_PAGES_ORIGIN
+    ? { ...baseHeaders, "Access-Control-Allow-Origin": GITHUB_PAGES_ORIGIN }
+    : baseHeaders;
+}
+
+export function OPTIONS(request: Request) {
+  const origin = request.headers.get("origin");
+  if (origin !== GITHUB_PAGES_ORIGIN) return new Response(null, { status: 403, headers: baseHeaders });
+  return new Response(null, { status: 204, headers: {
+    ...responseHeaders(origin),
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Max-Age": "600",
+  } });
+}
+
 export async function POST(request: Request) {
   const origin = request.headers.get("origin");
-  if (origin && origin !== new URL(request.url).origin) return Response.json({ error: "请求来源不匹配" }, { status: 403, headers });
+  const headers = responseHeaders(origin);
+  if (origin && origin !== new URL(request.url).origin && origin !== GITHUB_PAGES_ORIGIN) return Response.json({ error: "请求来源不匹配" }, { status: 403, headers });
   if (!request.headers.get("content-type")?.includes("application/json")) return Response.json({ error: "请求格式不正确" }, { status: 415, headers });
   let body = "", size = 0;
   const reader = request.body?.getReader();

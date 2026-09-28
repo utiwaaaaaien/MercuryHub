@@ -91,7 +91,8 @@ export default function Home() {
     setErrors(prev => { const next = { ...prev }; delete next[id]; return next; });
     const timer = setTimeout(() => controller.abort("timeout"), 18000);
     try {
-      const response = await fetch("/api/check", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }), signal: controller.signal });
+      const apiUrl = (window as Window & { __MERCURY_CHECK_API__?: string }).__MERCURY_CHECK_API__ ?? "/api/check";
+      const response = await fetch(apiUrl, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }), signal: controller.signal });
       let payload: CheckResult & { error?: string };
       try { payload = await response.json() as CheckResult & { error?: string }; }
       catch { throw new Error("检测服务暂时未返回结果，请稍后重试；这不代表目标网站失效"); }
@@ -108,7 +109,7 @@ export default function Home() {
     }
   }
   return <div className="app-shell">
-    <header className="topbar"><a href="/" className="brand" aria-label="MercuryHub 首页"><span className="brand-icon"><Clapperboard size={20} /></span><span>MercuryHub</span></a><span className="brand-subtitle">影视资源导航</span><button className={`help-toggle ${showHelp ? "selected" : ""}`} onClick={() => setShowHelp(v => !v)} aria-expanded={showHelp} aria-controls="check-help"><CircleHelp size={17} /><span>检测说明</span></button></header>
+    <header className="topbar"><a href="./" className="brand" aria-label="MercuryHub 首页"><span className="brand-icon"><Clapperboard size={20} /></span><span>MercuryHub</span></a><span className="brand-subtitle">影视资源导航</span><button className={`help-toggle ${showHelp ? "selected" : ""}`} onClick={() => setShowHelp(v => !v)} aria-expanded={showHelp} aria-controls="check-help"><CircleHelp size={17} /><span>检测说明</span></button></header>
     <main className="main-wrap">
       <section className="intro"><h1>好资源，直接抵达。</h1><p>按星级浏览 {sites.length} 个影视资源站点，选择入口即可打开。</p></section>
       {showHelp && <section id="check-help" className="help-panel"><h2>检测结果应该怎么看？</h2><p>为减少代理和托管服务的请求量，已关闭批量检测。每次只检测一个站点，两次新请求至少间隔 30 秒；同一入口在 15 分钟内复用上次结果，不会重新访问目标站点。</p><p>检测从服务器发出，与您当前的网络、代理和登录状态可能不同。“请求成功”只表示入口返回成功响应，不保证资源可下载。受限、超时和跨域跳转请手动打开确认。历史结果保存在当前浏览器，并保留原检测时间。</p></section>}

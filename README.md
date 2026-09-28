@@ -25,6 +25,10 @@ pnpm dev
 
 在 `lib/sites.json` 修改站点数据后重新构建发布。`capacity` 和 `rating` 沿用原表，不是自动抓取或实时统计。原 Excel 未修改。
 
-## 发布
+## GitHub Pages
 
-`.openai/hosting.json` 保存唯一 Sites 项目 ID。生成的 Cloudflare Worker 位于 `dist/server/index.js`，静态资产位于 `dist/client`。保留这两个目录与部署清单组成发布包。仅通过 Sites 的版本与部署工具发布，勿在源码或命令行写入凭证。
+公开页面位于 `https://utiwaaaaaien.github.io/MercuryHub/`。推送 `main` 后，`.github/workflows/pages.yml` 用 `pnpm build:pages` 构建并发布静态页面。`github-pages/index.html` 指向现有 Sites 检测接口；GitHub Pages 只提供页面文件，检测请求从原有服务器发出。
+
+## 检测服务
+
+`.openai/hosting.json` 保存 Sites 项目 ID。生成的 Cloudflare Worker 位于 `dist/server/index.js`，静态资产位于 `dist/client`。检测接口只接受同源或 `https://utiwaaaaaien.github.io` 的浏览器请求。修改检测服务后，需通过 Sites 的版本与部署工具更新；发布前将源码推送到 Sites 源仓库。不要在源码或命令行写入凭证。
