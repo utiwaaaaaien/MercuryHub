@@ -1,13 +1,15 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowUpRight, Check, CircleHelp, Clapperboard, Clock3, Film, Globe2, LoaderCircle, Radio, Search, ShieldAlert, Sparkles, Square, X } from "lucide-react";
+import { ArrowUpRight, Check, CircleHelp, Clapperboard, Clock3, Film, Globe2, LoaderCircle, Radio, Search, ShieldAlert, Sparkles, X } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Progress } from "@/components/ui/progress";
 import sites from "@/lib/sites.json";
 import type { CheckResult } from "@/lib/check-types";
 
 const STORAGE_KEY = "mercury-checks-v1";
+const LAST_REQUEST_KEY = "mercury-last-check-request-v1";
+const CHECK_INTERVAL_MS = 30_000;
+const RESULT_CACHE_MS = 15 * 60_000;
 const labels: Record<string, string> = { reachable: "请求成功", restricted: "访问受限", failed: "连接失败", error: "页面异常", review: "需人工确认", unchecked: "未检测" };
 const categories = [{ id: "all", label: "全部站点", icon: Globe2 }, { id: "真人", label: "真人影视", icon: Film }, { id: "动画", label: "动画资源", icon: Sparkles }];
 const isIssue = (r?: CheckResult) => !!r && r.state !== "reachable";
@@ -20,12 +22,12 @@ export default function Home() {
   const [results, setResults] = useState<Record<string, CheckResult>>({});
   const [checking, setChecking] = useState<Set<string>>(new Set());
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [run, setRun] = useState<{ total: number; done: number; active: boolean; cancelled: boolean } | null>(null);
+  const [lastRequestAt, setLastRequestAt] = useState(0);
+  const [clock, setClock] = useState(0);
   const [ready, setReady] = useState(false);
   const [storageIssue, setStorageIssue] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const controllers = useRef(new Map<string, AbortController>());
-  const batch = useRef<{ cancelled: boolean } | null>(null);
   useEffect(() => {
     try {
       const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "{}");
@@ -35,9 +37,25 @@ export default function Home() {
         if (item && item.id === site.id && ["reachable", "restricted", "failed", "error", "review"].includes(item.state) && Number.isFinite(Date.parse(item.checkedAt)) && typeof item.reason === "string" && typeof item.location === "string" && typeof item.durationMs === "number") valid[site.id] = item;
       }
       setResults(valid);
+      setClock(Date.now());
+      const savedRequestAt = Number(localStorage.getItem(LAST_REQUEST_KEY));
+      if (Number.isFinite(savedRequestAt) && savedRequestAt > 0 && savedRequestAt <= Date.now()) setLastRequestAt(savedRequestAt);
     } catch { setStorageIssue(true); }
     setReady(true);
-    return () => { if (batch.current) batch.current.cancelled = true; for (const controller of controllers.current.values()) controller.abort(); };
+    return () => { for (const controller of controllers.current.values()) controller.abort(); };
+  }, []);
+  useEffect(() => {
+    const timer = setInterval(() => setClock(Date.now()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+  useEffect(() => {
+    const onStorage = (event: StorageEvent) => {
+      if (event.key !== LAST_REQUEST_KEY) return;
+      const at = Number(event.newValue);
+      if (Number.isFinite(at) && at > 0 && at <= Date.now()) setLastRequestAt(at);
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
   }, []);
   useEffect(() => {
     if (!ready) return;
@@ -52,10 +70,21 @@ export default function Home() {
   }), [query, category, status, results]);
   const goodCount = Object.values(results).filter(r => r.state === "reachable").length;
   const issueCount = Object.values(results).filter(isIssue).length;
-  const issueSites = sites.filter(site => isIssue(results[site.id]) || errors[site.id]);
-  const busy = checking.size > 0 || !!run?.active;
+  const cooldownSeconds = lastRequestAt > 0 ? Math.max(0, Math.ceil((lastRequestAt + CHECK_INTERVAL_MS - clock) / 1000)) : 0;
   async function checkOne(id: string) {
     if (controllers.current.has(id)) return;
+    const previous = results[id];
+    if (previous && Date.now() - Date.parse(previous.checkedAt) < RESULT_CACHE_MS) {
+      setResults(current => ({ ...current, [id]: { ...previous, cached: true } }));
+      return;
+    }
+    const now = Date.now();
+    let lastAt = lastRequestAt;
+    try { lastAt = Math.max(lastAt, Number(localStorage.getItem(LAST_REQUEST_KEY)) || 0); } catch { /* The in-memory cooldown still applies. */ }
+    if (now - lastAt < CHECK_INTERVAL_MS || controllers.current.size > 0) return;
+    setLastRequestAt(now);
+    setClock(now);
+    try { localStorage.setItem(LAST_REQUEST_KEY, String(now)); } catch { setStorageIssue(true); }
     const controller = new AbortController(); controllers.current.set(id, controller);
     setChecking(prev => new Set([...prev, id]));
     setErrors(prev => { const next = { ...prev }; delete next[id]; return next; });
@@ -77,46 +106,28 @@ export default function Home() {
       setChecking(prev => { const next = new Set(prev); next.delete(id); return next; });
     }
   }
-  async function checkMany(targets = sites) {
-    if (busy || batch.current || !targets.length) return;
-    const token = { cancelled: false }; batch.current = token;
-    let next = 0;
-    setRun({ total: targets.length, done: 0, active: true, cancelled: false });
-    await Promise.all(Array.from({ length: Math.min(4, targets.length) }, async () => {
-      while (!token.cancelled && next < targets.length) {
-        const site = targets[next++]; await checkOne(site.id);
-        if (!token.cancelled) setRun(prev => prev ? { ...prev, done: prev.done + 1 } : prev);
-      }
-    }));
-    setRun(prev => prev ? { ...prev, active: false, cancelled: token.cancelled } : prev);
-    batch.current = null;
-  }
-  function cancel() {
-    if (batch.current) batch.current.cancelled = true;
-    for (const controller of controllers.current.values()) controller.abort("cancel");
-  }
   return <div className="app-shell">
     <header className="topbar"><a href="/" className="brand" aria-label="Mercury 影视资源导航首页"><span className="brand-icon"><Clapperboard size={23} /></span><span>Mercury<span className="brand-subtitle">影视资源导航</span></span></a><button className={`help-toggle ${showHelp ? "selected" : ""}`} onClick={() => setShowHelp(v => !v)} aria-expanded={showHelp} aria-controls="check-help"><CircleHelp size={17} /><span>检测说明</span></button></header>
     <main className="main-wrap">
       <section className="intro"><div><h1>找到入口，直达资源。</h1><p>你的影视站点，集中在这里。</p></div><div className="intro-count"><span>{sites.length}</span><span>个精选入口</span></div></section>
-      {showHelp && <section id="check-help" className="help-panel"><h2>检测结果应该怎么看？</h2><p>检测从服务器发出，与您当前的网络、代理和登录状态可能不同。“请求成功”表示入口返回成功响应，不保证页面内容或下载资源可用。验证码、登录限制和自动请求拦截会单独提示。</p><p>同一入口的检测结果可能复用最近 60 秒的缓存。历史结果保存在当前浏览器，每条结果都保留原检测时间。跨域跳转需手动确认，原始入口始终可以直接打开。</p></section>}
+      {showHelp && <section id="check-help" className="help-panel"><h2>检测结果应该怎么看？</h2><p>为减少代理和托管服务的请求量，已关闭批量检测。每次只检测一个站点，两次新请求至少间隔 30 秒；同一入口在 15 分钟内复用上次结果，不会重新访问目标站点。</p><p>检测从服务器发出，与您当前的网络、代理和登录状态可能不同。“请求成功”只表示入口返回成功响应，不保证资源可下载。受限、超时和跨域跳转请手动打开确认。历史结果保存在当前浏览器，并保留原检测时间。</p></section>}
       <section className="workspace" aria-label="站点导航与检测">
-        <div className="action-row"><div className="search-wrap"><Search size={20} /><input aria-label="搜索站点名称或网址" placeholder="搜索站点名称或网址…" value={query} onChange={event => setQuery(event.target.value)} />{query && <button onClick={() => setQuery("")} aria-label="清空搜索"><X size={17} /></button>}</div><button className="primary-button" onClick={() => checkMany()} disabled={busy}>{run?.active ? <LoaderCircle className="spin" size={18} /> : <Radio size={18} />}{run?.active ? "正在检测" : "检测全部站点"}</button></div>
+        <div className="action-row"><div className="search-wrap"><Search size={20} /><input aria-label="搜索站点名称或网址" placeholder="搜索站点名称或网址…" value={query} onChange={event => setQuery(event.target.value)} />{query && <button onClick={() => setQuery("")} aria-label="清空搜索"><X size={17} /></button>}</div><p className="check-policy">逐站检测 · {cooldownSeconds > 0 ? `${cooldownSeconds} 秒后可检测下一个` : "每次新请求间隔 30 秒"}</p></div>
         <div className="filter-row"><Tabs value={category} onValueChange={setCategory} className="category-tabs"><TabsList aria-label="资源分类" className="category-list">{categories.map(item => <TabsTrigger key={item.id} value={item.id} className="category-tab"><item.icon size={17} /><span>{item.label}</span><span className="tab-count">{item.id === "all" ? sites.length : sites.filter(site => site.categories.includes(item.id)).length}</span></TabsTrigger>)}</TabsList></Tabs><Select value={status} onValueChange={setStatus}><SelectTrigger className="status-select" aria-label="筛选检测状态"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">全部状态</SelectItem><SelectItem value="reachable">请求成功</SelectItem><SelectItem value="issues">需要关注</SelectItem><SelectItem value="unchecked">尚未检测</SelectItem></SelectContent></Select></div>
         <div className="monitor-strip"><span className="network-label"><Globe2 size={16} />服务器检测</span><div className="status-summary"><span><i className="dot reachable" />成功 <b>{goodCount}</b></span><span><i className="dot restricted" />需关注 <b>{issueCount}</b></span><span><i className="dot unchecked" />未检测 <b>{sites.length - Object.keys(results).length}</b></span></div><span className="monitor-note">结果以检测时间为准</span></div>
-        {run && <div className="batch-progress" role="status" aria-live="polite"><div><span>{run.active ? "正在检查入口" : run.cancelled ? "已取消，已完成的结果已保留" : "本轮检测已结束"} <b>{run.done}/{run.total}</b></span>{run.active ? <button onClick={cancel}><Square size={12} />取消检测</button> : issueSites.length > 0 ? <button disabled={busy} onClick={() => checkMany(issueSites)}>重试需关注项</button> : <Check size={17} />}</div><Progress value={run.done / run.total * 100} aria-label="批量检测进度" /></div>}
         {storageIssue && <p className="storage-notice" role="status">当前浏览器无法保存历史结果，检测和跳转仍可使用。</p>}
         <div className="list-heading"><h2>{category === "all" ? "所有站点" : category === "真人" ? "真人影视" : "动画资源"}<span>{visible.length}</span></h2><span>新标签页打开</span></div>
         <div className="site-grid">{visible.map(site => {
           const result = results[site.id], loading = checking.has(site.id);
           const stale = !!result && Date.now() - Date.parse(result.checkedAt) > 3600000;
           const state = result?.state ?? "unchecked";
+          const recent = !!result && Date.now() - Date.parse(result.checkedAt) < RESULT_CACHE_MS;
           return <article key={site.id} className={`site-card ${loading ? "is-checking" : ""}`} data-site-id={site.id}>
             <div className="card-head"><div className={`site-mark tone-${site.categories.length === 2 ? "blue" : site.categories[0] === "动画" ? "violet" : "slate"}`} aria-hidden="true">{site.mark}</div><div className="site-title"><h3><a href={site.url} target="_blank" rel="noopener noreferrer">{site.name}</a></h3><span>{new URL(site.url).hostname.replace(/^www\./, "")}</span></div></div>
             <div className="site-tags">{site.categories.map(tag => <span key={tag}>{tag}</span>)}<span className="rating" title="推荐指数来自原表">原表推荐 {site.rating}/5</span></div>
             <div className="site-capacity"><span>片库容量 <small>原表记录</small></span><strong>{site.capacity.toLocaleString("zh-CN")}<small> 部</small></strong></div>
             <div className="check-area" aria-live="polite"><div className={`check-state ${loading ? "loading" : state}`}>{loading ? <LoaderCircle className="spin" size={15} /> : state === "reachable" ? <Check size={15} /> : ["restricted", "review", "error", "failed"].includes(state) ? <ShieldAlert size={15} /> : <Clock3 size={15} />}<span>{loading ? "正在检测…" : labels[state]}</span>{result && !loading && <span className="response-code">{result.statusCode ? `HTTP ${result.statusCode}` : ""}</span>}</div><p className="check-time">{result ? `${stale ? "历史 · " : ""}${timeLabel(result.checkedAt)}${result.cached ? " · 缓存" : ""}` : "点击检测，查看当前连接情况"}</p>{errors[site.id] && <p className="check-service-error">{errors[site.id]}{result ? "（上次结果保留）" : ""}</p>}</div>
-            <div className="card-actions"><a className="open-button" href={site.url} target="_blank" rel="noopener noreferrer">打开网站<ArrowUpRight size={17} /></a><button className="check-button" onClick={() => checkOne(site.id)} disabled={loading || !!run?.active} aria-label={`检测 ${site.name}`}><Radio size={16} />检测</button></div>
+            <div className="card-actions"><a className="open-button" href={site.url} target="_blank" rel="noopener noreferrer">打开网站<ArrowUpRight size={17} /></a><button className="check-button" onClick={() => checkOne(site.id)} disabled={loading || (cooldownSeconds > 0 && !recent) || (checking.size > 0 && !recent)} aria-label={`${recent ? "查看最近结果" : "检测"} ${site.name}`}><Radio size={16} />{recent ? "最近结果" : "检测"}</button></div>
             {result && <details className="result-details"><summary>检测详情</summary><p>{result.reason}</p><dl><div><dt>检测网络</dt><dd>{result.location}</dd></div><div><dt>请求耗时</dt><dd>{(result.durationMs / 1000).toFixed(2)} 秒</dd></div><div><dt>检查地址</dt><dd>{result.finalUrl}</dd></div></dl></details>}
           </article>;
         })}</div>

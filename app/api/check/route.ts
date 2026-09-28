@@ -6,6 +6,8 @@ const cache = new Map<string, { at: number; result: CheckResult }>();
 const pending = new Map<string, Promise<CheckResult>>();
 const limits = new Map<string, { at: number; count: number }>();
 const headers = { "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" };
+const RESULT_CACHE_MS = 15 * 60_000;
+const REQUEST_INTERVAL_MS = 30_000;
 
 export async function POST(request: Request) {
   const origin = request.headers.get("origin");
@@ -30,15 +32,15 @@ export async function POST(request: Request) {
   if (!site) return Response.json({ error: "站点不在导航清单中" }, { status: 400, headers });
   const now = Date.now();
   const saved = cache.get(site.id);
-  if (saved && now - saved.at < 60000) return Response.json({ ...saved.result, cached: true }, { headers });
+  if (saved && now - saved.at < RESULT_CACHE_MS) return Response.json({ ...saved.result, cached: true }, { headers });
   const active = pending.get(site.id);
   if (active) return Response.json(await active, { headers });
   const ip = request.headers.get("cf-connecting-ip") ?? "local";
-  for (const [key, limit] of limits) if (now - limit.at >= 60000) limits.delete(key);
+  for (const [key, limit] of limits) if (now - limit.at >= REQUEST_INTERVAL_MS) limits.delete(key);
   const limit = limits.get(ip);
-  if (limit && limit.count >= 36) return Response.json({ error: "检测较频繁，请一分钟后重试" }, { status: 429, headers: { ...headers, "Retry-After": "60" } });
-  if ((!limit && limits.size >= 2048) || pending.size >= 6) return Response.json({ error: "检测服务繁忙，请稍后重试" }, { status: 503, headers });
-  limits.set(ip, { at: limit?.at ?? now, count: (limit?.count ?? 0) + 1 });
+  if (limit) return Response.json({ error: "为减少连续请求，请 30 秒后再检测其他站点" }, { status: 429, headers: { ...headers, "Retry-After": String(Math.max(1, Math.ceil((REQUEST_INTERVAL_MS - (now - limit.at)) / 1000))) } });
+  if (limits.size >= 2048 || pending.size >= 2) return Response.json({ error: "检测服务繁忙，请稍后重试" }, { status: 503, headers });
+  limits.set(ip, { at: now, count: 1 });
   const cf = (request as Request & { cf?: { colo?: string } }).cf;
   const location = process.env.NODE_ENV === "development" ? "本机预览服务网络" : cf?.colo ? `服务器网络 · ${cf.colo}` : "服务器网络";
   const job = checkLink(site, { location }); pending.set(site.id, job);

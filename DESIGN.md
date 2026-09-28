@@ -66,7 +66,7 @@ Soft rectangular cards and controls; functional symbols from Lucide, text marks 
 
 ## Components
 
-Primary action checks all 18 sites. Search and category filters update results in place. Each card preserves its external opening action through loading and errors. Progress updates in place; reduced-motion preferences disable the loading spin.
+Each card supports a single on-demand check, with a visible cooldown between new requests. Search and category filters update results in place. Each card preserves its external opening action through loading and errors; reduced-motion preferences disable the loading spin.
 
 ## Do's and Don'ts
 
