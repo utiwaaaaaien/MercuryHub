@@ -7,6 +7,7 @@ import sites from "@/lib/sites.json";
 import type { CheckResult } from "@/lib/check-types";
 
 const STALE_MS = 36 * 60 * 60_000;
+const REFRESH_MS = 30 * 60_000;
 const labels: Record<string, string> = { reachable: "请求成功", restricted: "访问受限", failed: "连接失败", error: "页面异常", review: "需人工确认", unchecked: "未检测" };
 const categories = [{ id: "all", label: "全部站点", icon: Globe2 }, { id: "真人", label: "真人影视", icon: Film }, { id: "动画", label: "动画资源", icon: Sparkles }];
 const rankedSites = [...sites].sort((a, b) => b.rating - a.rating);
@@ -19,13 +20,17 @@ export default function Home() {
   const [status, setStatus] = useState("all");
   const [results, setResults] = useState<Record<string, CheckResult>>({});
   const [snapshotAt, setSnapshotAt] = useState<string | null>(null);
-  const [loadedAt, setLoadedAt] = useState(0);
+  const [now, setNow] = useState(() => Date.now());
   const [snapshotError, setSnapshotError] = useState(false);
   const [loadingSnapshot, setLoadingSnapshot] = useState(true);
   const [showHelp, setShowHelp] = useState(false);
   useEffect(() => {
     const controller = new AbortController();
+    let inFlight = false;
+    let lastFetchedAt = 0;
     async function loadSnapshot() {
+      if (inFlight || controller.signal.aborted) return;
+      inFlight = true;
       try {
         const response = await fetch(`./checks.json?t=${Date.now()}`, { cache: "no-store", signal: controller.signal });
         if (!response.ok) throw new Error("检测结果未发布");
@@ -39,15 +44,29 @@ export default function Home() {
         if (Object.keys(valid).length !== sites.length) throw new Error("检测结果不完整");
         setResults(valid);
         setSnapshotAt(snapshot.generatedAt);
-        setLoadedAt(Date.now());
+        setSnapshotError(false);
       } catch {
         if (!controller.signal.aborted) setSnapshotError(true);
       } finally {
+        lastFetchedAt = Date.now();
+        inFlight = false;
         if (!controller.signal.aborted) setLoadingSnapshot(false);
       }
     }
+    function refreshIfVisible() {
+      setNow(Date.now());
+      if (document.visibilityState === "visible" && Date.now() - lastFetchedAt >= REFRESH_MS) void loadSnapshot();
+    }
     void loadSnapshot();
-    return () => controller.abort();
+    const timer = window.setInterval(refreshIfVisible, 60_000);
+    window.addEventListener("focus", refreshIfVisible);
+    document.addEventListener("visibilitychange", refreshIfVisible);
+    return () => {
+      controller.abort();
+      window.clearInterval(timer);
+      window.removeEventListener("focus", refreshIfVisible);
+      document.removeEventListener("visibilitychange", refreshIfVisible);
+    };
   }, []);
   const visible = useMemo(() => rankedSites.filter(site => {
     const textMatch = `${site.name} ${site.url} ${site.categories.join(" ")}`.toLowerCase().includes(query.trim().toLowerCase());
@@ -58,6 +77,7 @@ export default function Home() {
   }), [query, category, status, results]);
   const goodCount = Object.values(results).filter(r => r.state === "reachable").length;
   const issueCount = Object.values(results).filter(isIssue).length;
+  const snapshotStale = !!snapshotAt && now - Date.parse(snapshotAt) > STALE_MS;
   return <div className="app-shell">
     <header className="topbar"><a href="./" className="brand" aria-label="MercuryHub 首页"><span className="brand-icon"><Clapperboard size={20} /></span><span>MercuryHub</span></a><span className="brand-subtitle">影视资源导航</span><button className={`help-toggle ${showHelp ? "selected" : ""}`} onClick={() => setShowHelp(v => !v)} aria-expanded={showHelp} aria-controls="check-help"><CircleHelp size={17} /><span>检测说明</span></button></header>
     <main className="main-wrap">
@@ -67,11 +87,12 @@ export default function Home() {
         <div className="action-row"><div className="search-wrap"><Search size={20} /><input aria-label="搜索站点名称或网址" placeholder="搜索站点名称或网址…" value={query} onChange={event => setQuery(event.target.value)} />{query && <button onClick={() => setQuery("")} aria-label="清空搜索"><X size={17} /></button>}</div><p className="check-policy">{snapshotAt ? `每日检测 · ${timeLabel(snapshotAt)} 更新` : loadingSnapshot ? "正在读取检测结果…" : "每日检测 · 暂无结果"}</p></div>
         <div className="filter-row"><Tabs value={category} onValueChange={setCategory} className="category-tabs"><TabsList aria-label="资源分类" className="category-list">{categories.map(item => <TabsTrigger key={item.id} value={item.id} className="category-tab"><item.icon size={17} /><span>{item.label}</span><span className="tab-count">{item.id === "all" ? sites.length : sites.filter(site => site.categories.includes(item.id)).length}</span></TabsTrigger>)}</TabsList></Tabs><Select value={status} onValueChange={setStatus}><SelectTrigger className="status-select" aria-label="筛选检测状态"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">全部状态</SelectItem><SelectItem value="reachable">请求成功</SelectItem><SelectItem value="issues">需要关注</SelectItem><SelectItem value="unchecked">尚未检测</SelectItem></SelectContent></Select></div>
         <div className="monitor-strip"><span className="network-label"><Globe2 size={16} />GitHub 定时检测</span><div className="status-summary"><span><i className="dot reachable" />成功 <b>{goodCount}</b></span><span><i className="dot restricted" />需关注 <b>{issueCount}</b></span><span><i className="dot unchecked" />未检测 <b>{sites.length - Object.keys(results).length}</b></span></div><span className="monitor-note">结果以检测时间为准</span></div>
-        {snapshotError && <p className="storage-notice" role="status">检测结果暂不可用，请稍后刷新页面；站点链接仍可打开。</p>}
+        {snapshotError && <p className="storage-notice" role="status">{snapshotAt ? "暂时无法获取最新检测结果，当前显示上次读取的结果。" : "检测结果暂不可用，请稍后刷新页面；站点链接仍可打开。"}</p>}
+        {snapshotStale && <p className="storage-notice" role="status">最近一次检测已超过 36 小时，结果可能过期，请手动打开网站核实。</p>}
         <div className="list-heading"><h2>{category === "all" ? "全部资源网站" : category === "真人" ? "真人影视" : "动画资源"}<span>{visible.length}</span></h2><span>按星级从高到低 · 新标签页打开</span></div>
         <div className="site-grid">{visible.map(site => {
           const result = results[site.id];
-          const stale = !!result && loadedAt - Date.parse(result.checkedAt) > STALE_MS;
+          const stale = !!result && now - Date.parse(result.checkedAt) > STALE_MS;
           const state = result?.state ?? "unchecked";
           return <article key={site.id} className="site-card" data-site-id={site.id}>
             <div className="card-head"><div className="site-title"><h3><a href={site.url} target="_blank" rel="noopener noreferrer">{site.name}</a></h3><span>{new URL(site.url).hostname.replace(/^www\./, "")}</span></div></div>
