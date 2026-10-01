@@ -8,7 +8,7 @@ import type { CheckResult } from "@/lib/check-types";
 
 const STALE_MS = 36 * 60 * 60_000;
 const REFRESH_MS = 30 * 60_000;
-const labels: Record<string, string> = { reachable: "请求成功", restricted: "访问受限", failed: "连接失败", error: "页面异常", review: "需人工确认", unchecked: "未检测" };
+const labels: Record<string, string> = { reachable: "请求成功", restricted: "自动检测受限", failed: "本次连接失败", error: "本次响应异常", review: "需人工确认", unchecked: "未检测" };
 const categories = [{ id: "all", label: "全部站点", icon: Globe2 }, { id: "真人", label: "真人影视", icon: Film }, { id: "动画", label: "动画资源", icon: Sparkles }];
 const rankedSites = [...sites].sort((a, b) => b.rating - a.rating);
 const isIssue = (r?: CheckResult) => !!r && r.state !== "reachable";
@@ -174,7 +174,7 @@ export default function Home() {
     <header className="topbar"><a href="./" className="brand" aria-label="MercuryHub 首页"><span className="brand-icon"><Clapperboard size={20} /></span><span>MercuryHub</span></a><span className="brand-subtitle">影视资源导航</span><button className={`help-toggle ${showHelp ? "selected" : ""}`} onClick={() => setShowHelp(v => !v)} aria-expanded={showHelp} aria-controls="check-help"><CircleHelp size={17} /><span>检测说明</span></button></header>
     <main className="main-wrap">
       <section className="intro"><h1>好资源，直接抵达。</h1><p>按星级浏览 {sites.length} 个影视资源站点，选择入口即可打开。</p></section>
-      {showHelp && <section id="check-help" className="help-panel"><h2>检测结果应该怎么看？</h2><p>GitHub Actions 每天从服务器检测一次清单中的站点，页面显示最近一次发布的结果。检测可能因 GitHub 任务延迟或网站防护而晚于计划时间，请以页面上的检测时间为准。</p><p>检测网络与您当前的网络、代理和登录状态可能不同。“请求成功”只表示入口返回成功响应，不保证资源可下载。受限、超时和跨域跳转请手动打开确认。</p></section>}
+      {showHelp && <section id="check-help" className="help-panel"><h2>检测结果应该怎么看？</h2><p>GitHub Actions 每天从服务器检测一次清单中的站点，页面显示最近一次发布的结果。检测可能因 GitHub 任务延迟或网站防护而晚于计划时间，请以页面上的检测时间为准。</p><p>检测网络与您当前的网络、代理和登录状态可能不同。“请求成功”只表示入口返回成功响应，不保证资源可下载。“自动检测受限”表示检测请求被拒绝、需要安全验证或登录，浏览器可能仍可打开；它不等于网站不可用。超时和跨域跳转也请手动打开确认。</p></section>}
       <section className="workspace" aria-label="站点导航与检测">
         <div className="action-row"><div className="search-wrap"><Search size={20} /><input aria-label="搜索站点名称或网址" placeholder="搜索站点名称或网址…" value={query} onChange={event => setQuery(event.target.value)} />{query && <button onClick={() => setQuery("")} aria-label="清空搜索"><X size={17} /></button>}</div><p className="check-policy">{snapshotAt ? `每日检测 · ${timeLabel(snapshotAt)} 更新` : loadingSnapshot ? "正在读取检测结果…" : "每日检测 · 暂无结果"}</p></div>
         <div className="filter-row"><Tabs value={category} onValueChange={value => { setCategory(value); if (value !== category) trackAnalytics(categoryEvents[value]); }} className="category-tabs"><TabsList aria-label="资源分类" className="category-list">{categories.map(item => <TabsTrigger key={item.id} value={item.id} className="category-tab"><item.icon size={17} /><span>{item.label}</span><span className="tab-count">{item.id === "all" ? sites.length : sites.filter(site => site.categories.includes(item.id)).length}</span></TabsTrigger>)}</TabsList></Tabs><Select value={status} onValueChange={value => { setStatus(value); if (value !== status) trackAnalytics(statusEvents[value]); }}><SelectTrigger className="status-select" aria-label="筛选检测状态"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">全部状态</SelectItem><SelectItem value="reachable">请求成功</SelectItem><SelectItem value="issues">需要关注</SelectItem><SelectItem value="unchecked">尚未检测</SelectItem></SelectContent></Select></div>
@@ -193,6 +193,7 @@ export default function Home() {
             <div className="site-capacity">片库容量 <strong>{site.capacity.toLocaleString("zh-CN")} 部</strong></div>
             <div className="card-actions"><a className="open-button" href={site.url} onClick={() => trackAnalytics(`打开资源 · ${site.name}`)} onAuxClick={event => { if (event.button === 1) trackAnalytics(`打开资源 · ${site.name}`); }} target="_blank" rel="noopener noreferrer">打开网站<ArrowUpRight size={18} /></a></div>
             <div className="check-area" aria-live="polite"><div className={`check-state ${state}`}>{state === "reachable" ? <Check size={15} /> : ["restricted", "review", "error", "failed"].includes(state) ? <ShieldAlert size={15} /> : <Clock3 size={15} />}<span>{labels[state]}</span>{result && <span className="response-code">{result.statusCode ? `HTTP ${result.statusCode}` : ""}</span>}</div><p className="check-time">{result ? `${stale ? "历史 · " : ""}${timeLabel(result.checkedAt)}` : loadingSnapshot ? "正在读取检测结果" : "暂无检测结果"}</p></div>
+            {state === "restricted" && <p className="check-time" style={{ marginTop: 6 }}>浏览器可能仍可打开，请手动确认。</p>}
             {result && <details className="result-details"><summary>检测详情</summary><p>{result.reason}</p><dl><div><dt>检测网络</dt><dd>{result.location}</dd></div><div><dt>请求耗时</dt><dd>{(result.durationMs / 1000).toFixed(2)} 秒</dd></div><div><dt>检查地址</dt><dd>{result.finalUrl}</dd></div></dl></details>}
           </article>;
         })}</div>
