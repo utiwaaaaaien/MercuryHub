@@ -34,6 +34,11 @@ export async function checkLink(target: { id: string; url: string }, options: Op
         current = next;
         continue;
       }
+      // Cloudflare distinguishes an actual interstitial from passive detection scripts.
+      if (response.headers.get("cf-mitigated")?.trim().toLowerCase() === "challenge") {
+        await response.body?.cancel();
+        return result("restricted", "自动检测遇到安全验证，浏览器可能仍可打开，请手动确认", response.status);
+      }
       if ([401, 403, 407, 429, 451].includes(response.status)) {
         await response.body?.cancel();
         return result("restricted", response.status === 429 ? "网站限制了请求频率，请稍后重试" : response.status === 401 ? "网站要求身份验证" : "网站拒绝本次自动请求，可尝试手动打开", response.status);
@@ -56,7 +61,12 @@ export async function checkLink(target: { id: string; url: string }, options: Op
         } finally { await reader.cancel().catch(() => {}); }
       }
       const title = sample.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] ?? "";
-      if (/just a moment|attention required|access denied|verify you are human|安全验证|人机验证|访问验证/i.test(title) || /cf-chl-|challenge-platform|id=["']challenge-form/i.test(sample)) return result("restricted", "检测到安全验证页面，请在浏览器中确认", response.status);
+      // A challenge-platform URL can also appear on a normal page (JSD/Precursor).
+      // Require a challenge title, an actual challenge form, or interstitial options.
+      const challengePage = /just a moment|attention required|access denied|verify you are human|安全验证|人机验证|访问验证/i.test(title)
+        || /<form\b[^>]*\bid\s*=\s*["']challenge-form["']/i.test(sample)
+        || /(?:window\.)?_cf_chl_opt\s*=\s*\{/i.test(sample);
+      if (challengePage) return result("restricted", "自动检测遇到安全验证，浏览器可能仍可打开，请手动确认", response.status);
       if (/\b(sign in|log in|login)\b|登录|登入/i.test(title) || /\/(login|signin)(\/|\?|$)/i.test(current.href)) return result("restricted", "入口跳转或返回登录页，请登录后确认", response.status);
       if (/domain (is )?for sale|buy this domain|域名出售|网站已关闭|站点已关闭/i.test(title)) return result("review", "页面可能已停用或域名正在出售，请手动确认", response.status);
       if (response.status === 204 || !sample.trim()) return result("review", "服务器响应成功，但未返回可核验的页面内容", response.status);
