@@ -43,3 +43,24 @@ test('large body stops after sample without buffering whole response',async()=>{
   const result=await checkLink(target,{fetcher:async()=>new Response(new ReadableStream({pull(c){c.enqueue(new TextEncoder().encode('<title>Movies</title>'+'a'.repeat(65536)));},cancel(){cancelled=true;}}))});
   assert.equal(result.state,'reachable');assert.equal(cancelled,true);
 });
+
+test('normal pages with passive Cloudflare detection are reachable', async () => {
+  for (const body of [
+    '<title>Movies</title><main>Movie catalog</main><script src="/cdn-cgi/challenge-platform/scripts/precursor/main.js"></script>',
+    '<title>Movies</title><main>Movie catalog</main><script src="/cdn-cgi/challenge-platform/scripts/jsd/api.js"></script>',
+    '<title>Documentation</title><a href="/cf-chl-example">Challenge platform documentation</a>',
+  ]) assert.equal((await checkLink(target, { fetcher: fake(body) })).state, 'reachable');
+});
+test('explicit Cloudflare challenge headers are restricted even with a generic title', async () => {
+  for (const status of [200, 403, 503]) {
+    const result = await checkLink(target, { fetcher: fake('<title>Website</title>', status, { 'cf-mitigated': 'challenge' }) });
+    assert.equal(result.state, 'restricted');
+    assert.match(result.reason, /安全验证/);
+  }
+});
+test('actual challenge forms and interstitial options remain restricted', async () => {
+  for (const body of [
+    '<title>Website</title><form class="verify" id="challenge-form"><button>Verify</button></form>',
+    '<title>Website</title><script>window._cf_chl_opt = {cType: "managed"};</script>',
+  ]) assert.equal((await checkLink(target, { fetcher: fake(body) })).state, 'restricted');
+});
