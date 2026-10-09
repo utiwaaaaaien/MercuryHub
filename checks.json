@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-08T10:42:42.203Z",
+  "generatedAt": "2026-10-09T10:41:55.836Z",
   "results": {
     "mini4k": {
       "id": "mini4k",
@@ -7,8 +7,8 @@
       "reason": "入口返回成功响应；页面内容及下载资源需自行确认",
       "statusCode": 200,
       "finalUrl": "https://mini4k.io/movies",
-      "checkedAt": "2026-10-08T10:42:22.860Z",
-      "durationMs": 874,
+      "checkedAt": "2026-10-09T10:41:32.421Z",
+      "durationMs": 1274,
       "location": "GitHub Actions 服务器网络"
     },
     "rb4k": {
@@ -17,8 +17,8 @@
       "reason": "入口返回成功响应；页面内容及下载资源需自行确认",
       "statusCode": 200,
       "finalUrl": "https://rb4k.cn/",
-      "checkedAt": "2026-10-08T10:42:24.564Z",
-      "durationMs": 1204,
+      "checkedAt": "2026-10-09T10:41:34.962Z",
+      "durationMs": 2040,
       "location": "GitHub Actions 服务器网络"
     },
     "seedhub": {
@@ -27,8 +27,8 @@
       "reason": "自动检测遇到安全验证，浏览器可能仍可打开，请手动确认",
       "statusCode": 403,
       "finalUrl": "https://sidhub.cc/",
-      "checkedAt": "2026-10-08T10:42:25.115Z",
-      "durationMs": 52,
+      "checkedAt": "2026-10-09T10:41:35.634Z",
+      "durationMs": 172,
       "location": "GitHub Actions 服务器网络"
     },
     "bitba": {
@@ -37,8 +37,8 @@
       "reason": "入口返回成功响应；页面内容及下载资源需自行确认",
       "statusCode": 200,
       "finalUrl": "https://www.bitba.net/",
-      "checkedAt": "2026-10-08T10:42:26.154Z",
-      "durationMs": 538,
+      "checkedAt": "2026-10-09T10:41:36.913Z",
+      "durationMs": 779,
       "location": "GitHub Actions 服务器网络"
     },
     "pomo": {
@@ -46,8 +46,8 @@
       "state": "failed",
       "reason": "服务器本次未能连接；可能受网络或网站防护影响",
       "finalUrl": "https://pomo.mom/",
-      "checkedAt": "2026-10-08T10:42:27.600Z",
-      "durationMs": 947,
+      "checkedAt": "2026-10-09T10:41:38.920Z",
+      "durationMs": 1508,
       "location": "GitHub Actions 服务器网络"
     },
     "hdduck": {
@@ -56,8 +56,8 @@
       "reason": "入口返回成功响应；页面内容及下载资源需自行确认",
       "statusCode": 200,
       "finalUrl": "https://hdduck.com/",
-      "checkedAt": "2026-10-08T10:42:28.844Z",
-      "durationMs": 744,
+      "checkedAt": "2026-10-09T10:41:40.440Z",
+      "durationMs": 1020,
       "location": "GitHub Actions 服务器网络"
     },
     "butailing": {
@@ -66,8 +66,8 @@
       "reason": "入口返回成功响应；页面内容及下载资源需自行确认",
       "statusCode": 200,
       "finalUrl": "http://www.butailing.com/",
-      "checkedAt": "2026-10-08T10:42:30.378Z",
-      "durationMs": 1033,
+      "checkedAt": "2026-10-09T10:41:42.119Z",
+      "durationMs": 1179,
       "location": "GitHub Actions 服务器网络"
     },
     "easyoo": {
@@ -76,8 +76,8 @@
       "reason": "入口返回成功响应；页面内容及下载资源需自行确认",
       "statusCode": 200,
       "finalUrl": "https://www.easyoo.cn/",
-      "checkedAt": "2026-10-08T10:42:32.035Z",
-      "durationMs": 1158,
+      "checkedAt": "2026-10-09T10:41:44.141Z",
+      "durationMs": 1522,
       "location": "GitHub Actions 服务器网络"
     },
     "trex": {
@@ -86,8 +86,8 @@
       "reason": "入口返回成功响应；页面内容及下载资源需自行确认",
       "statusCode": 200,
       "finalUrl": "https://t-rex.tzfile.com/",
-      "checkedAt": "2026-10-08T10:42:32.878Z",
-      "durationMs": 344,
+      "checkedAt": "2026-10-09T10:41:45.266Z",
+      "durationMs": 625,
       "location": "GitHub Actions 服务器网络"
     },
     "animes": {
@@ -96,8 +96,8 @@
       "reason": "入口返回成功响应；页面内容及下载资源需自行确认",
       "statusCode": 200,
       "finalUrl": "https://animes.garden/",
-      "checkedAt": "2026-10-08T10:42:34.136Z",
-      "durationMs": 759,
+      "checkedAt": "2026-10-09T10:41:46.320Z",
+      "durationMs": 554,
       "location": "GitHub Actions 服务器网络"
     },
     "dtsma": {
@@ -105,8 +105,8 @@
       "state": "failed",
       "reason": "服务器本次未能连接；可能受网络或网站防护影响",
       "finalUrl": "https://www.dtsma.com/",
-      "checkedAt": "2026-10-08T10:42:34.977Z",
-      "durationMs": 340,
+      "checkedAt": "2026-10-09T10:41:47.371Z",
+      "durationMs": 552,
       "location": "GitHub Actions 服务器网络"
     },
     "4kbt": {
@@ -115,8 +115,8 @@
       "reason": "自动检测遇到安全验证，浏览器可能仍可打开，请手动确认",
       "statusCode": 403,
       "finalUrl": "https://4kbt.org/",
-      "checkedAt": "2026-10-08T10:42:35.517Z",
-      "durationMs": 41,
+      "checkedAt": "2026-10-09T10:41:48.054Z",
+      "durationMs": 184,
       "location": "GitHub Actions 服务器网络"
     },
     "4k007": {
@@ -125,8 +125,8 @@
       "reason": "入口返回成功响应；页面内容及下载资源需自行确认",
       "statusCode": 200,
       "finalUrl": "https://www.4k007.com/",
-      "checkedAt": "2026-10-08T10:42:36.760Z",
-      "durationMs": 743,
+      "checkedAt": "2026-10-09T10:41:49.566Z",
+      "durationMs": 1011,
       "location": "GitHub Actions 服务器网络"
     },
     "vcb": {
@@ -135,8 +135,8 @@
       "reason": "自动检测遇到安全验证，浏览器可能仍可打开，请手动确认",
       "statusCode": 403,
       "finalUrl": "https://vcb-s.com/archives/138",
-      "checkedAt": "2026-10-08T10:42:37.319Z",
-      "durationMs": 59,
+      "checkedAt": "2026-10-09T10:41:50.150Z",
+      "durationMs": 84,
       "location": "GitHub Actions 服务器网络"
     },
     "acgrip": {
@@ -145,8 +145,8 @@
       "reason": "入口返回成功响应；页面内容及下载资源需自行确认",
       "statusCode": 200,
       "finalUrl": "https://acg.rip/",
-      "checkedAt": "2026-10-08T10:42:38.654Z",
-      "durationMs": 835,
+      "checkedAt": "2026-10-09T10:41:51.437Z",
+      "durationMs": 788,
       "location": "GitHub Actions 服务器网络"
     },
     "bilibili": {
@@ -155,8 +155,8 @@
       "reason": "入口返回成功响应；页面内容及下载资源需自行确认",
       "statusCode": 200,
       "finalUrl": "https://www.bilibili.com/anime/",
-      "checkedAt": "2026-10-08T10:42:39.694Z",
-      "durationMs": 540,
+      "checkedAt": "2026-10-09T10:41:52.852Z",
+      "durationMs": 915,
       "location": "GitHub Actions 服务器网络"
     },
     "suenen": {
@@ -165,8 +165,8 @@
       "reason": "入口返回成功响应；页面内容及下载资源需自行确认",
       "statusCode": 200,
       "finalUrl": "https://suenen.com/forum-7.htm",
-      "checkedAt": "2026-10-08T10:42:40.850Z",
-      "durationMs": 657,
+      "checkedAt": "2026-10-09T10:41:54.311Z",
+      "durationMs": 959,
       "location": "GitHub Actions 服务器网络"
     },
     "fx57": {
@@ -175,8 +175,8 @@
       "reason": "入口返回成功响应；页面内容及下载资源需自行确认",
       "statusCode": 200,
       "finalUrl": "http://www.fx57.cn/",
-      "checkedAt": "2026-10-08T10:42:42.202Z",
-      "durationMs": 853,
+      "checkedAt": "2026-10-09T10:41:55.836Z",
+      "durationMs": 1025,
       "location": "GitHub Actions 服务器网络"
     }
   }
