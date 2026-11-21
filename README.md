@@ -1,5 +1,7 @@
 # MercuryHub 影视资源导航
 
+[English](#english)
+
 公开页面：[MercuryHub](https://utiwaaaaaien.github.io/MercuryHub/)。原始清单来自父目录 Excel，18 条完整链接保存在 `lib/sites.json`。
 
 ## 发布与检测
@@ -22,3 +24,11 @@ pnpm exec vite preview --config pages.vite.config.ts
 ```
 
 打开命令输出的本地网址。代码检查：`pnpm exec tsc --noEmit`；检测规则测试：`node --experimental-strip-types --test tests/check-link.test.mjs`。
+
+## English
+
+MercuryHub is a directory of film and TV resource sites. [Open MercuryHub](https://utiwaaaaaien.github.io/MercuryHub/) to browse links and see when they were last checked.
+
+GitHub Actions checks the links on pushes to `main`, on manual runs, and on a daily schedule at 11:17 China Standard Time. The site shows the actual check time and marks results older than 36 hours. Results reflect the runner’s network access at the time. A successful request confirms a server response. Content availability depends on the site and your network or sign-in status.
+
+Edit `lib/sites.json` to maintain the directory. For a local build, use Node.js 22.13 or later and pnpm 11.19, then follow the commands under [本地验证](#本地验证).
