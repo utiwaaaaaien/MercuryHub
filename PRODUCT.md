@@ -1,4 +1,6 @@
 # Mercury 影视资源导航
+
+> 早期产品设计记录。当前线上版本的使用方式和检测规则见 [README](README.md)。
 <!-- impeccable:product-schema 1 -->
 
 ## Platform
