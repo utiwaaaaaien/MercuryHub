@@ -2,7 +2,11 @@
 
 [English](#english)
 
-公开页面：[MercuryHub](https://utiwaaaaaien.github.io/MercuryHub/)。原始清单来自父目录 Excel，18 条完整链接保存在 `lib/sites.json`。
+## 使用导航
+
+打开 [MercuryHub](https://utiwaaaaaien.github.io/MercuryHub/)，浏览影视资源链接和各站点的最近检测时间。遇到失效链接或资源分类问题，可以在 [Issues](https://github.com/utiwaaaaaien/MercuryHub/issues) 附上站点名和链接。
+
+18 条初始链接保存在 `lib/sites.json`，来源为原始 Excel 清单。
 
 ## 发布与检测
 
@@ -27,7 +31,7 @@ pnpm exec vite preview --config pages.vite.config.ts
 
 ## English
 
-MercuryHub is a directory of film and TV resource sites. [Open MercuryHub](https://utiwaaaaaien.github.io/MercuryHub/) to browse links and see when they were last checked.
+MercuryHub is a directory of film and TV resource sites. [Open MercuryHub](https://utiwaaaaaien.github.io/MercuryHub/) to browse links and see when they were last checked. Report a broken link or an incorrect listing in [Issues](https://github.com/utiwaaaaaien/MercuryHub/issues) with the site name and URL.
 
 GitHub Actions checks the links on pushes to `main`, on manual runs, and on a daily schedule at 11:17 China Standard Time. The site shows the actual check time and marks results older than 36 hours. Results reflect the runner’s network access at the time. A successful request confirms a server response. Content availability depends on the site and your network or sign-in status.
 
